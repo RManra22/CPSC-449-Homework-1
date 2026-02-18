@@ -5,14 +5,13 @@ import com.example.webbackend.entity.Book;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
 public class BookController {
     private List<Book> books = new ArrayList<>();
-    private Long nextId = 1l;
+    private Long nextId = 1L;
 
     public BookController() {
         books.add(new Book(nextId++, "Spring Boot in Action", "Craig Walls", 39.99));
@@ -37,6 +36,7 @@ public class BookController {
     public List<Book> getBooks() {
         return books;
     }
+
     // get book by id
     @GetMapping("/books/{id}")
     public Book getBook(@PathVariable Long id) {
@@ -46,6 +46,7 @@ public class BookController {
     // create a new book
     @PostMapping("/books")
     public List<Book> createBook(@RequestBody Book book){
+        book.setId(nextId++);
         books.add(book);
         return books;
     }
@@ -107,9 +108,33 @@ public class BookController {
 
     }
 
-
-
     // http://localhost:8082/api/books/price-range?minRange=10&maxRange=45
     // http://localhost:8082/api/books/sorted?sortBy=author&order=desc
+
+    // Delete book by ID
+    @DeleteMapping("/books/{id}")
+    public String deleteBook(@PathVariable Long id) {
+        Book book = getBook(id);
+
+        if (book != null) {
+            books.remove(book);
+            return "Book {id} was deleted!";
+        }
+        return "Book not found!";
+    }
+
+    // Update book by ID
+    @PutMapping("/books/{id}")
+    public String updateBook (@PathVariable Long id, @RequestBody Book updateBook)
+    {
+            Book oldBook = getBook(id);
+            if(oldBook != null) {
+                oldBook.setAuthor(updateBook.getAuthor());
+                oldBook.setTitle(updateBook.getTitle());
+                oldBook.setPrice(updateBook.getPrice());
+                return "Book was updated";
+            }
+            return "Book was not found!";
+    }
 }
 
