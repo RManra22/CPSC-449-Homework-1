@@ -103,7 +103,9 @@ public class BookController {
             comparator = comparator.reversed();
         }
 
-        return books.stream().sorted(comparator)
+        return books
+                .stream()
+                .sorted(comparator)
                 .collect(Collectors.toList());
 
     }
@@ -118,23 +120,109 @@ public class BookController {
 
         if (book != null) {
             books.remove(book);
-            return "Book {id} was deleted!";
+            return "Book was deleted!";
         }
         return "Book not found!";
     }
+    // http://localhost:8082/api/books/3
 
     // Update book by ID
     @PutMapping("/books/{id}")
-    public String updateBook (@PathVariable Long id, @RequestBody Book updateBook)
-    {
-            Book oldBook = getBook(id);
-            if(oldBook != null) {
-                oldBook.setAuthor(updateBook.getAuthor());
-                oldBook.setTitle(updateBook.getTitle());
-                oldBook.setPrice(updateBook.getPrice());
-                return "Book was updated";
-            }
-            return "Book was not found!";
+    public String updateBook (
+            @PathVariable Long id,
+            @RequestBody Book updateBook
+    ){
+        Book oldBook = getBook(id);
+        if(oldBook != null) {
+            oldBook.setAuthor(updateBook.getAuthor());
+            oldBook.setTitle(updateBook.getTitle());
+            oldBook.setPrice(updateBook.getPrice());
+            return "Book was updated";
+        }
+
+        return "Book was not found!";
     }
+    // http://localhost:8082/api/books/3
+
+    // Patch Book by id
+    @PatchMapping("/books/{id}")
+    public String patchBook (
+            @PathVariable Long id,
+            @RequestBody Book updateBook
+    ){
+        Book oldBook = getBook(id);
+        if(oldBook != null) {
+            if (!updateBook.getAuthor().isEmpty() && updateBook.getAuthor() != null){
+                oldBook.setAuthor(updateBook.getAuthor());
+            }
+            if (!updateBook.getTitle().isEmpty() && updateBook.getTitle() != null){
+                oldBook.setTitle(updateBook.getTitle());
+            }
+            if (updateBook.getPrice() >= 0.0 && updateBook.getPrice() != null){
+                oldBook.setPrice(updateBook.getPrice());
+            }
+            return "Book was updated";
+        }
+        return "Book was not found!";
+    }
+
+    // Get books with pages
+    @GetMapping("/books/pagination")
+    public List<Book> getBooksPaged(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size
+    ){
+        int startAt = (page - 1) * size;
+
+        return books.stream()
+                .skip(startAt)
+                .limit(size)
+                .collect(Collectors.toList());
+    }
+    // http://localhost:8082/api/books/pagination?page=1&size=5
+
+    // Advance GET with filtering, sorting, and pagination
+    @GetMapping("/books/advance")
+    public List<Book> getBookAdvance(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false, defaultValue = "title") String sortBy,
+            @RequestParam(required = false, defaultValue = "asc") String order,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice
+    ){
+        int startAt = (page - 1) * size;
+
+        Comparator<Book> comparator;
+
+        switch(sortBy.toLowerCase()){
+            case "author" :
+                comparator = Comparator.comparing(Book::getAuthor);
+                break;
+            case "title":
+                comparator = Comparator.comparing(Book::getTitle);
+                break;
+            default:
+                comparator = Comparator.comparing(Book::getTitle);
+                break;
+        }
+
+        if("desc".equalsIgnoreCase(order)){
+            comparator = comparator.reversed();
+        }
+
+        return books.stream()
+                .filter(b -> {
+                    boolean min = minPrice == null || b.getPrice() >= minPrice;
+                    boolean max = maxPrice == null || b.getPrice() <= maxPrice;
+                    return min && max;
+                })
+                .sorted(comparator)
+                .skip(startAt)
+                .limit(size)
+                .collect(Collectors.toList());
+
+    }
+    // http://localhost:8082/api/books/advance?page=1&size=5&sortBy=author&minPrice=20.00
 }
 
