@@ -110,8 +110,12 @@ public class BookController {
 
     }
 
-    // http://localhost:8082/api/books/price-range?minRange=10&maxRange=45
+    // http://localhost:8082/api/books/price-range?minPrice=10&maxPrice=45
     // http://localhost:8082/api/books/sorted?sortBy=author&order=desc
+
+
+    // CPSC 449 - Spring 449 - Homework 1
+    // Name: Roberto Manra
 
     // Delete book by ID
     @DeleteMapping("/books/{id}")
@@ -157,10 +161,10 @@ public class BookController {
         if (updateBook.getAuthor() != null && !updateBook.getAuthor().isBlank()){
             oldBook.setAuthor(updateBook.getAuthor());
         }
-        if (updateBook.getTitle() != null && !updateBook.getAuthor().isBlank()){
+        if (updateBook.getTitle() != null && !updateBook.getTitle().isBlank()){
             oldBook.setTitle(updateBook.getTitle());
         }
-        if (updateBook.getPrice() != null && !updateBook.getAuthor().isBlank()){
+        if (updateBook.getPrice() != null){
             oldBook.setPrice(updateBook.getPrice());
         }
             return "Book was updated";
@@ -170,8 +174,8 @@ public class BookController {
     // Get books with pages
     @GetMapping("/books/pagination")
     public List<Book> getBooksPaged(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "5") int size
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "5") int size
     ){
         if (page < 1) page = 1;
         if (size < 1) size = 5;
@@ -195,6 +199,8 @@ public class BookController {
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice
     ){
+        if (page < 1) page = 1;
+        if (size < 1) size = 5;
         int startAt = (page - 1) * size;
 
         Comparator<Book> comparator;
