@@ -41,13 +41,13 @@ Results:
 <img width="1919" height="1031" alt="image" src="https://github.com/user-attachments/assets/33e0cccb-dc84-4ff4-8473-486823a9a06a" />
 
 GET endpoint with pagination
-// http://localhost:8082/api/books/pagination?page=1&size=5
+http://localhost:8082/api/books/pagination?page=1&size=5
 
 Results: 
 <img width="1919" height="1032" alt="image" src="https://github.com/user-attachments/assets/98e42ebf-0f98-4621-b53f-bae9f3fdd0e2" />
 
 Advanced GET endpoint with filtering, sorting, and pagination combined in the valid order
-// http://localhost:8082/api/books/advance?page=1&size=5&sortBy=author&minPrice=20.00
+http://localhost:8082/api/books/advance?page=1&size=5&sortBy=author&minPrice=20.00
 
 Results: 
 <img width="1919" height="1034" alt="image" src="https://github.com/user-attachments/assets/c371d805-a6e9-4e72-ae6c-e0f3a7f26aa4" />
