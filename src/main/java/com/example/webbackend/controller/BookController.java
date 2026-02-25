@@ -133,11 +133,12 @@ public class BookController {
             @RequestBody Book updateBook
     ){
         Book oldBook = getBook(id);
+
         if(oldBook != null) {
             oldBook.setAuthor(updateBook.getAuthor());
             oldBook.setTitle(updateBook.getTitle());
             oldBook.setPrice(updateBook.getPrice());
-            return "Book was updated";
+            return "Book was updated!";
         }
 
         return "Book was not found!";
@@ -151,19 +152,19 @@ public class BookController {
             @RequestBody Book updateBook
     ){
         Book oldBook = getBook(id);
-        if(oldBook != null) {
-            if (!updateBook.getAuthor().isEmpty() && updateBook.getAuthor() != null){
-                oldBook.setAuthor(updateBook.getAuthor());
-            }
-            if (!updateBook.getTitle().isEmpty() && updateBook.getTitle() != null){
-                oldBook.setTitle(updateBook.getTitle());
-            }
-            if (updateBook.getPrice() >= 0.0 && updateBook.getPrice() != null){
-                oldBook.setPrice(updateBook.getPrice());
-            }
-            return "Book was updated";
+        if (oldBook == null) return "Book was not found!";
+
+        if (updateBook.getAuthor() != null && !updateBook.getAuthor().isBlank()){
+            oldBook.setAuthor(updateBook.getAuthor());
         }
-        return "Book was not found!";
+        if (updateBook.getTitle() != null && !updateBook.getAuthor().isBlank()){
+            oldBook.setTitle(updateBook.getTitle());
+        }
+        if (updateBook.getPrice() != null && !updateBook.getAuthor().isBlank()){
+            oldBook.setPrice(updateBook.getPrice());
+        }
+            return "Book was updated";
+
     }
 
     // Get books with pages
@@ -172,6 +173,8 @@ public class BookController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size
     ){
+        if (page < 1) page = 1;
+        if (size < 1) size = 5;
         int startAt = (page - 1) * size;
 
         return books.stream()
@@ -188,6 +191,7 @@ public class BookController {
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(required = false, defaultValue = "title") String sortBy,
             @RequestParam(required = false, defaultValue = "asc") String order,
+            @RequestParam(required = false) String title,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice
     ){
@@ -215,13 +219,13 @@ public class BookController {
                 .filter(b -> {
                     boolean min = minPrice == null || b.getPrice() >= minPrice;
                     boolean max = maxPrice == null || b.getPrice() <= maxPrice;
-                    return min && max;
+                    boolean titleMatch = title == null || b.getTitle().toLowerCase().contains(title.toLowerCase());
+                    return min && max && titleMatch;
                 })
                 .sorted(comparator)
                 .skip(startAt)
                 .limit(size)
                 .collect(Collectors.toList());
-
     }
     // http://localhost:8082/api/books/advance?page=1&size=5&sortBy=author&minPrice=20.00
 }
