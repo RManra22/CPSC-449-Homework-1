@@ -5,7 +5,7 @@ Name: Roberto Manra
 PUT endpoint (update book)
 http://localhost:8082/api/books/3
 update book 
-```JSON: 
+```json: 
 {
   "title": "Hello World",
   "author": "Roberto Manra",
@@ -20,7 +20,7 @@ Results:
 PATCH endpoint (partial update):
 http://localhost:8082/api/books/3
 update book 
-```JSON: 
+```json: 
 {
   "title": "Hello from the Patch endpoint!"
 }
